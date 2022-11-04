@@ -54,7 +54,7 @@ def createAllMissions(planet_list):
     return mission_list
     
 
-def savePlanetMissionRelationToPrologFile(planet_list, save_name = "planets_mission.pl"):
+def savePlanetMissionRelationToPrologFile(planet_list, save_name = "planet_mission.pl"):
     save_location = os.path.join(GLOBAL_FILE_PATH, save_name)
     def temp():
         for planet in planet_list:
