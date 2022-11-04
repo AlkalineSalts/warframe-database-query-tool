@@ -42,10 +42,15 @@ type '.' Once the question has either exhausted valid answers or the '.' key has
 
 Prolog facts/rules:
 relic_drops(Relic, Relic_State, Item, Probability).
+
 planet_mission(Planet, Mission).
+
 mission_reward(Mission, Rotation, Item, Probability).
+
 missionType_mission(MissionType, Mission).
-is_vaulted(Item)
-is_not_vaulted(Item)
+
+is_vaulted(Item).
+
+is_not_vaulted(Item).
 
 
