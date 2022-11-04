@@ -31,11 +31,9 @@ def saveRelicsToPrologFile(relics_list, save_name = "relic_drops.pl"):
     save_location = os.path.join(GLOBAL_FILE_PATH, save_name)
     def temp():
         for relic in relics_list:
-            if (relic.get_state() != "Intact"):
-                continue
             rewards_generator = relic.get_reward_generator()
             for reward in rewards_generator:
-                prolog_fact = "relic_drops('{}', '{}', {}).\n".format(convert_to_prolog_str(str(relic)), convert_to_prolog_str(reward.get_name()), reward.get_chance())
+                prolog_fact = "relic_drops('{}', '{}', '{}', {}).\n".format(convert_to_prolog_str(str(relic)), convert_to_prolog_str(relic.get_state()), convert_to_prolog_str(reward.get_name()), reward.get_chance())
                 yield prolog_fact
     save_file(save_location, temp())
 
