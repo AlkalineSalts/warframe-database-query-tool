@@ -8,8 +8,10 @@ rotationHelper(LETTER, NUMBER) :- NUM is NUMBER + 1, 0 is mod(NUM, 4), LETTER = 
 rotationHelper(LETTER, NUMBER) :- ((NUM is NUMBER + 2, 0 is mod(NUM, 4)); (NUM2 is NUMBER + 3, 0 is mod(NUM2, 4))), LETTER = 'A', !.
 
 
+is_in_droptables_help(ITEM) :- mission_reward(_, _, ITEM, _).
+is_in_droptables(ITEM) :- (var(ITEM) -> is_in_droptables_help(ITEM); (is_in_droptables_help(ITEM), !)).
 
-is_not_vaulted_help(X) :- findall(ITEM, (relic_drops(RELIC, _, ITEM, _), mission_reward(_, _, RELIC, _)), BAG), sort(BAG, SORTED), member(X, SORTED).
+is_not_vaulted_help(X) :- findall(ITEM, (relic_drops(RELIC, _, ITEM, _), is_in_droptables(RELIC)), BAG), sort(BAG, SORTED), member(X, SORTED).
 is_not_vaulted(X) :- (var(X) -> is_not_vaulted_help(X); (is_not_vaulted_help(X), !)).
 
 

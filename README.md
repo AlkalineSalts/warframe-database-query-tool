@@ -53,4 +53,4 @@ is_vaulted(Item).
 
 is_not_vaulted(Item).
 
-
+is_in_droptables(Item).
