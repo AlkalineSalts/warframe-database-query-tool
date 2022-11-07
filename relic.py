@@ -22,6 +22,6 @@ class Relic:
         return self.state
     
     def __str__(self):
-        return "{} {} Relic".format(self.tier, self.relicName)
+        return "{} {} Relic ({})".format(self.tier, self.relicName, self.state)
     def __repr__(self):
         return self.__str__()
