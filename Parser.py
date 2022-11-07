@@ -33,8 +33,12 @@ def saveRelicsToPrologFile(relics_list, save_name = "relic_drops.pl"):
         for relic in relics_list:
             rewards_generator = relic.get_reward_generator()
             for reward in rewards_generator:
-                prolog_fact = "relic_drops('{}', '{}', '{}', {}).\n".format(convert_to_prolog_str(str(relic)), convert_to_prolog_str(relic.get_state()), convert_to_prolog_str(reward.get_name()), reward.get_chance())
+                prolog_fact = "relic_drops(\"{}\", \"{}\", {}).\n".format(convert_to_prolog_str(str(relic)), convert_to_prolog_str(reward.get_name()), reward.get_chance())
                 yield prolog_fact
+        #Create rule for dealing with relics strings that don't have state in them
+        yield '% Rule for dealing with relic strs that don\'t include their state\n'
+        yield 'relic_drops(NAME, ITEM, CHANCE) :- (var(NAME) -> fail; (relic_drops_help(NAME, ITEM, CHANCE))).\n'
+        yield 'relic_drops_help(NAME, ITEM, CHANCE) :- (string_concat(_, ")", NAME) -> fail; (relic_drops(RELIC, ITEM, CHANCE), string_concat(NAME, " (Intact)", RELIC))).\n'
     save_file(save_location, temp())
 
 def createAllPlanets(fullJson):
@@ -50,8 +54,15 @@ def createAllMissions(planet_list):
         g = planet.get_mission_name_generator()
         for mission_name in g:
             mission = planet.get_mission(mission_name)
-            mission_list.append(mission)
+            mission_list.append(mission)        
+    
     return mission_list
+
+def addTransientMissions(mission_list, transient_json):
+    for place in transient_json:
+        obj_name = place['objectiveName']
+        mission = Mission(obj_name, place)
+        mission_list.append(mission)
     
 
 def savePlanetMissionRelationToPrologFile(planet_list, save_name = "planet_mission.pl"):
@@ -60,7 +71,7 @@ def savePlanetMissionRelationToPrologFile(planet_list, save_name = "planet_missi
         for planet in planet_list:
             g = planet.get_mission_name_generator()
             for mission_name in g:
-                prolog_fact = "planet_mission('{}', '{}').\n".format(convert_to_prolog_str(planet.get_name()), convert_to_prolog_str(mission_name))
+                prolog_fact = "planet_mission(\"{}\", \"{}\").\n".format(convert_to_prolog_str(planet.get_name()), convert_to_prolog_str(mission_name))
                 yield prolog_fact
     save_file(save_location, temp())
 
@@ -68,7 +79,7 @@ def saveMissionTypeMissionRelation(mission_list, save_name = "missionType_missio
     save_location = os.path.join(GLOBAL_FILE_PATH, save_name)
     def temp():
         for mission in mission_list:
-            prolog_fact = "missionType_mission('{}', '{}').\n".format(convert_to_prolog_str(mission.get_game_mode()), convert_to_prolog_str(mission.get_name()))
+            prolog_fact = "missionType_mission(\"{}\", \"{}\").\n".format(convert_to_prolog_str(mission.get_game_mode()), convert_to_prolog_str(mission.get_name()))
             yield prolog_fact
     save_file(save_location, temp())
 
@@ -77,7 +88,7 @@ def saveMissionRewardsToProlog(mission_list, save_name = "mission_reward.pl"):
     def temp():
         
         def fact_maker(a, b, c, d):
-            return "mission_reward('{}', '{}', '{}', {}).\n".format(convert_to_prolog_str(a), b, convert_to_prolog_str(c), d)
+            return "mission_reward(\"{}\", '{}', \"{}\", {}).\n".format(convert_to_prolog_str(a), b, convert_to_prolog_str(c), d)
 
         for mission in mission_list:
             if mission.has_rotations():
@@ -116,7 +127,10 @@ if __name__ == "__main__":
     savePlanetMissionRelationToPrologFile(planet_list)
     
     mission_list = createAllMissions(planet_list)
+    
     saveMissionTypeMissionRelation(mission_list)
+
+    addTransientMissions(mission_list, fullJson['transientRewards'])
     
     def split_mission_list(regular_mission_list, caches_mission_list):
         #Removes caches missions from the regular list of missions, as they must be dealt
