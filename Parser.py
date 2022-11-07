@@ -88,7 +88,7 @@ def saveMissionRewardsToProlog(mission_list, save_name = "mission_reward.pl"):
     def temp():
         
         def fact_maker(a, b, c, d):
-            return "mission_reward(\"{}\", '{}', \"{}\", {}).\n".format(convert_to_prolog_str(a), b, convert_to_prolog_str(c), d)
+            return "mission_reward(\"{}\", {}, \"{}\", {}).\n".format(convert_to_prolog_str(a), b, convert_to_prolog_str(c), d)
 
         for mission in mission_list:
             if mission.has_rotations():
@@ -96,15 +96,15 @@ def saveMissionRewardsToProlog(mission_list, save_name = "mission_reward.pl"):
                 #Forms facts for A rotation
                 a_rot_list = next(list_gen)
                 for reward in a_rot_list:
-                    prolog_fact = fact_maker(mission.get_name(), 'A', reward.get_name(), reward.get_chance())
+                    prolog_fact = fact_maker(mission.get_name(), '\'A\'', reward.get_name(), reward.get_chance())
                     yield prolog_fact
                 b_rot_list = next(list_gen)
                 for reward in b_rot_list:
-                    prolog_fact = fact_maker(mission.get_name(), 'B', reward.get_name(), reward.get_chance())
+                    prolog_fact = fact_maker(mission.get_name(), '\'B\'', reward.get_name(), reward.get_chance())
                     yield prolog_fact
                 c_rot_list = next(list_gen)
                 for reward in c_rot_list:
-                    prolog_fact = fact_maker(mission.get_name(), 'C', reward.get_name(), reward.get_chance())
+                    prolog_fact = fact_maker(mission.get_name(), '\'C\'', reward.get_name(), reward.get_chance())
                     yield prolog_fact
             else:
                 reward_list = next(mission.get_rewards())
