@@ -5,8 +5,8 @@ def _form_list_of_rewards(rewards_json_list):
 class Mission:
         def __init__(self, name, mission_dict):
                 self.name = name
-                self.gameMode = mission_dict['gameMode']
-                self.isEvent = mission_dict['isEvent']
+                self.gameMode = mission_dict.get('gameMode', None)
+                self.isEvent = mission_dict.get('isEvent', False)
 
                 #This is a list of rewards, with each index representing the rewards recieved per full 'round'
                 #For example, in a sabotage mission, which has only one set of rewards,
