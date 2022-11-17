@@ -30,6 +30,17 @@ def _readJsonFromFile(file_path):
     file.close()
     return data
 
+#Gets all json with data from the the website
+def _getWebJson():
+    most_json = _getJsonFromWeb("/data/all.json")
+    most_json = json.loads(most_json)
+    misc_items_json = _getJsonFromWeb("/data/miscItems.json")
+    misc_items_json = json.loads(misc_items_json)
+    misc_items_list = misc_items_json["miscItems"]
+    most_json["miscItems"] = misc_items_list
+    return json.dumps(most_json)
+    
+
 #Returns a loaded json object
 def getJson(forceUpdate=False):
     #Sets up the file_path so that this will work no matter where this file is called from
@@ -39,7 +50,7 @@ def getJson(forceUpdate=False):
     hashes_file_path = os.path.join(global_file_path, "Info.json")
     json_data = None
     if not os.path.exists(file_path) or not os.path.exists(hashes_file_path):
-        json_data = _getJsonFromWeb("/data/all.json")
+        json_data = _getWebJson()
         hashes_json = _getJsonFromWeb("/data/info.json")
         _saveJson(file_path, json_data)
         _saveJson(hashes_file_path, hashes_json)
@@ -49,7 +60,7 @@ def getJson(forceUpdate=False):
             hash_web_dict = json.loads(hash_web_json)
             hash_file_dict = json.loads(_readJsonFromFile(hashes_file_path))
             if hash_web_dict['hash'] != hash_file_dict['hash'] or forceUpdate:
-                json_data = _getJsonFromWeb("/data/all.json")
+                json_data = _getWebJson()
                 _saveJson(file_path, json_data)
                 _saveJson(hashes_file_path, hash_web_json)
         except LookupError:
