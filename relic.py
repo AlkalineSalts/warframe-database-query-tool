@@ -9,7 +9,7 @@ class Relic:
         self.tier = json_dict['tier']
         self.relicName = json_dict['relicName']
         self.state = json_dict['state']
-        self.rewards = [Reward(reward_json) for reward_json in json_dict['rewards']]
+        self.rewards = [Reward.from_json(reward_json) for reward_json in json_dict['rewards']]
 
     #Generator for the rewards attached to a relic
     def get_reward_generator(self):

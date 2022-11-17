@@ -5,7 +5,9 @@ import os
 from planet import Planet
 from mission import Mission
 from relic import Relic
-
+from enemy import EnemyBuilder
+from enemy import Enemy
+from reward import Reward
 #Converts json representation of warframe data into prolog facts and rules.
 
 GLOBAL_FILE_PATH = ""
@@ -112,7 +114,42 @@ def saveMissionRewardsToProlog(mission_list, save_name = "mission_reward.pl"):
                     prolog_fact = fact_maker(mission.get_name(), '_', reward.get_name(), reward.get_chance())
                     yield prolog_fact
     save_file(save_location, temp())
+
+def buildAllEnemies(fullJson):
+    miscItems = fullJson["miscItems"]
+    enemyToMods = fullJson["enemyModTables"]
+    id_to_builder = {}
+    def get_enemy_builder(id_num):
+        builder = id_to_builder.get(id_num, None)
+        if builder is None:
+            builder = EnemyBuilder(id_num)
+            id_to_builder[id_num] = builder
+        return builder
+    for enemy_mods_json in enemyToMods:
+        builder = get_enemy_builder(enemy_mods_json["_id"])
+        builder.set_name(enemy_mods_json["enemyName"])
+        builder.set_mod_chance(float(enemy_mods_json["enemyModDropChance"])/100)
+        for mod in enemy_mods_json["mods"]:
+            chance = mod['chance']
+            if (chance is None):
+                continue
+            mod_id = mod["_id"]
+            mod_name = mod["modName"]
+            chance = float(chance)/100
+            rarity = mod["rarity"]
+            builder.add_mod(Reward(mod_id, mod_name, chance, rarity))
+
+    for enemy_json in miscItems:
+        builder = get_enemy_builder(enemy_json["_id"])
+        builder.set_resource_chance(float(enemy_json["enemyItemDropChance"])/100)
+        for resource in enemy_json["items"]:
+            reward = Reward.from_json(resource)
+            builder.add_resource(reward)
+    
+    return id_to_builder
         
+    
+
 #Generates prolog facts
 if __name__ == "__main__":
     #Sets up prolog facts for relics
@@ -147,6 +184,8 @@ if __name__ == "__main__":
     caches_list = []
     split_mission_list(mission_list, caches_list)
     saveMissionRewardsToProlog(mission_list)
+
+    buildAllEnemies(fullJson)
 
     
                 

@@ -1,7 +1,7 @@
 import json
 from reward import Reward
 def _form_list_of_rewards(rewards_json_list):
-        return {Reward(idv_reward_json) for idv_reward_json in rewards_json_list}
+        return {Reward.from_json(idv_reward_json) for idv_reward_json in rewards_json_list}
 class Mission:
         def __init__(self, name, mission_dict):
                 self.name = name
