@@ -10,7 +10,7 @@ This will require an internet connection to fetch the data.
 The script will generate some prolog files, which hold the facts about the game.
 To efficiently access these, one should use a prolog interpreter, such as SWI-Prolog.
 
-For a command-line user, type in "swipl" to get started and upon it loading, type "ensure_loaded("path_to_main.pl")"
+For a command-line user, type in "swipl" to get started and upon it loading, type "ensure_loaded('path_to_main.pl')"
 Alternatively, running the bat file, which has commands that will work on both windows and linux computers will call the python script to update the prolog files
 and automatically load main.pl. 
 
