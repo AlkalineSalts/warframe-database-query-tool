@@ -3,19 +3,21 @@ from reward import Reward
 class Enemy:
     def __init__(self, resource_drop_chance:int, resources:set, mod_drop_chance:int, mods:list, id_num, name):
         self.resource_drop_chance = resource_drop_chance
-        self.resoures = resources
+        self.resources = resources
         self.mod_drop_chance = mod_drop_chance
         self.mods = mods
         self.id = id_num
         self.name = name
     def get_resource_drop_chance(self):
-        return resource_drop_chance
+        return self.resource_drop_chance
     def get_mod_drop_chance(self):
-        return mod_drop_chance
+        return self.mod_drop_chance
     def get_resource_drops(self):
-        return resources
+        return self.resources
     def get_mod_drops(self):
-        return mods
+        return self.mods
+    def get_name(self):
+        return self.name
     def __hash__(self):
         return int(self.id, 16)
     def __eq__(self, other):

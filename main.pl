@@ -2,6 +2,8 @@
 :- ensure_loaded('relic_drops.pl').
 :- ensure_loaded('missionType_mission.pl').
 :- ensure_loaded('mission_reward.pl').
+:- ensure_loaded('enemy_mod_drops').
+:- ensure_loaded('enemy_resource_drops').
 
 rotationHelper(LETTER, NUMBER) :- 0 is mod(NUMBER, 4), LETTER = 'C', !.
 rotationHelper(LETTER, NUMBER) :- NUM is NUMBER + 1, 0 is mod(NUM, 4), LETTER = 'B', !.

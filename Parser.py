@@ -119,15 +119,15 @@ def buildAllEnemies(fullJson):
     miscItems = fullJson["miscItems"]
     enemyToMods = fullJson["enemyModTables"]
     id_to_builder = {}
-    def get_enemy_builder(id_num):
+    def get_enemy_builder(id_num, enemy_json):
         builder = id_to_builder.get(id_num, None)
         if builder is None:
             builder = EnemyBuilder(id_num)
+            builder.set_name(enemy_json["enemyName"])
             id_to_builder[id_num] = builder
         return builder
     for enemy_mods_json in enemyToMods:
-        builder = get_enemy_builder(enemy_mods_json["_id"])
-        builder.set_name(enemy_mods_json["enemyName"])
+        builder = get_enemy_builder(enemy_mods_json["_id"], enemy_mods_json)
         builder.set_mod_chance(float(enemy_mods_json["enemyModDropChance"])/100)
         for mod in enemy_mods_json["mods"]:
             chance = mod['chance']
@@ -140,14 +140,36 @@ def buildAllEnemies(fullJson):
             builder.add_mod(Reward(mod_id, mod_name, chance, rarity))
 
     for enemy_json in miscItems:
-        builder = get_enemy_builder(enemy_json["_id"])
+        builder = get_enemy_builder(enemy_json["_id"], enemy_json)
         builder.set_resource_chance(float(enemy_json["enemyItemDropChance"])/100)
         for resource in enemy_json["items"]:
             reward = Reward.from_json(resource)
             builder.add_resource(reward)
-    
-    return id_to_builder
+    enemy_list = list(id_to_builder.values())
+    for i in range(len(enemy_list)):
+        enemy_list[i] = enemy_list[i].build()
+    return enemy_list
         
+def saveEnemyDataToProlog(enemy_list):
+    def get_prolog_fact(fact_name, enemy, reward):
+        fact = "{}(\"{}\", \"{}\", {}).\n".format(fact_name, convert_to_prolog_str(enemy.get_name()), convert_to_prolog_str(reward.get_name()), reward.get_chance())
+        return fact
+    def getModList(enemy):
+        return enemy.get_mod_drops()
+    def getResourceList(enemy):
+        return enemy.get_resource_drops()
+    def genericEnemyToProlog(enemy_list, save_name, fact_name, get_rewards):
+        save_location = os.path.join(GLOBAL_FILE_PATH, save_name)
+        def a():
+            for enemy in enemy_list:
+                for reward in get_rewards(enemy):
+                    fact = get_prolog_fact(fact_name, enemy, reward)
+                    yield fact
+        save_file(save_location, a())
+                
+    
+    genericEnemyToProlog(enemy_list, "enemy_mod_drops.pl", "enemy_mod_drops", getModList)
+    genericEnemyToProlog(enemy_list, "enemy_resource_drops.pl", "enemy_resource_drops", getResourceList)
     
 
 #Generates prolog facts
@@ -184,9 +206,11 @@ if __name__ == "__main__":
     caches_list = []
     split_mission_list(mission_list, caches_list)
     saveMissionRewardsToProlog(mission_list)
-
-    buildAllEnemies(fullJson)
-
+    del mission_list
+    
+    enemy_list = buildAllEnemies(fullJson)
+    saveEnemyDataToProlog(enemy_list)
+    
     
                 
             
